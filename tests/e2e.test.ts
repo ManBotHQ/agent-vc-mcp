@@ -53,7 +53,11 @@ describe('Agent-VC E2E Tests', () => {
     // Build the project first
     // Note: In real scenarios, use node build/index.js
     server = spawn('node', ['--loader', 'ts-node/esm', 'src/index.ts'], {
-      env: { ...process.env, AGENT_VC_ROOT_OVERRIDE: TEST_ROOT },
+      env: { 
+        ...process.env, 
+        AGENT_VC_ROOT_OVERRIDE: TEST_ROOT,
+        AGENT_VC_WORKSPACE: path.join(TEST_ROOT, 'workspace_checkout')
+      },
       stdio: ['pipe', 'pipe', 'inherit']
     });
 
