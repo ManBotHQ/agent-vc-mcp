@@ -80,7 +80,7 @@ export class FossilScm {
 
   // TICKET TOOLS
   static async createTicket(title: string, description: string): Promise<string> {
-    const result = await runCommand('fossil', ['ticket', 'add', 'title', title, 'comment', description], WORKSPACE_ROOT);
+    const result = await runCommand('fossil', ['ticket', 'add', 'title', title, 'status', 'Open', 'comment', description], WORKSPACE_ROOT);
     if (result.code !== 0) throw new Error(`Ticket create failed: ${result.stderr || result.stdout}`);
     return result.stdout;
   }
@@ -92,11 +92,13 @@ export class FossilScm {
   }
 
   static async listTickets(status?: string): Promise<string> {
-    const args = status ? ['ticket', 'list', 'status', status] : ['ticket', 'list'];
-    const result = await runCommand('fossil', args, WORKSPACE_ROOT);
-    if (!result.stdout.trim() && result.stderr.trim()) {
-       return `No tickets found (Fossil Output: ${result.stderr})`;
+    // We specify title to bypass the default report behavior which can be finicky in fresh repos
+    const args = ['ticket', 'list', 'title'];
+    if (status) {
+        // Fossil list status <value> works too
+        args.push('status', status);
     }
-    return result.stdout || "(No tasks found)";
+    const result = await runCommand('fossil', args, WORKSPACE_ROOT);
+    return result.stdout.trim() || "(No tasks found. Try checking 'fossil ui' for details.)";
   }
 }
