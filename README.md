@@ -140,3 +140,6 @@ Track work using the built-in ticket system.
   }
 }
 ```
+
+## Further Documentation
+For more advanced Fossil commands and features (like branching, merging, and syncing), refer to the official [Fossil SCM Documentation](https://www.fossil-scm.org/home/doc/trunk/www/permutedindex.html).
