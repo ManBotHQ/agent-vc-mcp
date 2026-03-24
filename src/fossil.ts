@@ -92,9 +92,11 @@ export class FossilScm {
   }
 
   static async listTickets(status?: string): Promise<string> {
-    const args = ['ticket', 'list'];
-    // By default, let's try to list title and status
+    const args = status ? ['ticket', 'list', 'status', status] : ['ticket', 'list'];
     const result = await runCommand('fossil', args, WORKSPACE_ROOT);
-    return result.stdout || "(Empty)";
+    if (!result.stdout.trim() && result.stderr.trim()) {
+       return `No tickets found (Fossil Output: ${result.stderr})`;
+    }
+    return result.stdout || "(No tasks found)";
   }
 }
