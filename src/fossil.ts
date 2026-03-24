@@ -92,17 +92,20 @@ export class FossilScm {
   }
 
   static async listTickets(status?: string): Promise<string> {
-    const args = status ? ['ticket', 'list', 'status', status] : ['ticket', 'list'];
-    const result = await runCommand('fossil', args, WORKSPACE_ROOT);
+    // 1. Try standard fossil command (tho report-based "show" is better for listing)
+    // Most users expect a summary, report 1 is usually "All Tickets"
+    const reportName = status ? status : "1";
+    const result = await runCommand('fossil', ['ticket', 'show', reportName], WORKSPACE_ROOT);
     
-    if (!result.stdout.trim()) {
+    if (result.code !== 0 || !result.stdout.trim()) {
+        // Fallback to SQL if report doesn't exist or is empty
         const sqlCmd = status 
-            ? `SELECT "id", "title", "status" FROM ticket WHERE status='${status}'` 
-            : `SELECT "id", "title", "status" FROM ticket`;
+            ? `SELECT substr(tkt_uuid, 1, 10) as id, title, status FROM ticket WHERE status='${status}'` 
+            : `SELECT substr(tkt_uuid, 1, 10) as id, title, status FROM ticket`;
         const sqlRes = await runCommand('fossil', ['sql', '-header', '-column', sqlCmd], WORKSPACE_ROOT);
         
         if (sqlRes.stdout.trim()) {
-            return `--- SQL FALLBACK --- \n${sqlRes.stdout.trim()}`;
+            return `--- CLI TICKET LIST --- \n${sqlRes.stdout.trim()}`;
         }
     }
     
