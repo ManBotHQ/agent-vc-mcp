@@ -18,7 +18,7 @@ export class FossilScm {
     
     // 2. Init fossil DB if it doesn't exist
     if (!(await FossilScm.exists())) {
-      console.log('Initializing Fossil Scm...');
+      console.error('Initializing Fossil Scm...');
       const initResult = await runCommand('fossil', ['init', FOSSIL_DB_PATH]);
       if (initResult.code !== 0) throw new Error(`Fossil init failed: ${initResult.stderr}`);
     }
@@ -27,16 +27,26 @@ export class FossilScm {
     await fs.mkdir(WORKSPACE_ROOT, { recursive: true });
 
     // 4. Open fossil if not opened
-    const openCheck = await fs.access(path.join(WORKSPACE_ROOT, '_FOSSIL_'))
-      .then(() => true)
-      .catch(() => false);
+    const dotFossil = path.join(WORKSPACE_ROOT, '_FOSSIL_');
+    const dotFslckout = path.join(WORKSPACE_ROOT, '.fslckout');
     
-    if (!openCheck) {
-      console.log('Opening Fossil repository in workspace...');
+    let isOpened = false;
+    try {
+        await fs.access(dotFossil);
+        isOpened = true;
+    } catch {
+        try {
+            await fs.access(dotFslckout);
+            isOpened = true;
+        } catch {}
+    }
+    
+    if (!isOpened) {
+      console.error('Opening Fossil repository in workspace...');
       const openResult = await runCommand('fossil', ['open', FOSSIL_DB_PATH], WORKSPACE_ROOT);
       // Fossil open sometimes fails if already open or directory not empty, but let's check for real errors
       if (openResult.code !== 0 && !openResult.stderr.includes('already open')) {
-         throw new Error(`Fossil open failed: ${openResult.stderr}`);
+         throw new Error(`Fossil open failed: ${openResult.stderr || openResult.stdout}`);
       }
     }
   }
