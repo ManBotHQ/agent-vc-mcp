@@ -10,11 +10,34 @@ A specialized MCP server for AI agents to have persistent state, version control
 - **Task Management**: Built-in tickets/tasks (via Fossil's ticket system) to track progress without external dependencies.
 - **Sandboxed**: Operations are strictly limited to `~/.agent-vc/workspace/`.
 
-## Structure
+## Structure & File Management
 
-- `~/.agent-vc/`: Root directory for agent data.
-- `~/.agent-vc/version_control.fossil`: The single-file SQLite database containing the entire project history.
-- `~/.agent-vc/workspace/`: The open checkout where the agent reads and writes files.
+### Core Directories
+
+- `~/.agent-vc/`: The root directory for all Agent-VC data and configuration.
+- `~/.agent-vc/version_control.fossil`: The Fossil repository file. This is a single SQLite database that stores your entire project history, version control objects, and task/ticket data.
+- `~/.agent-vc/workspace/`: The active checkout directory. All operations performed by the agent occur within this directory. This is the only place files are read from or written to.
+
+### File and Folder Mapping
+
+Agent-VC uses a "Project" based organization within the shared workspace. This allows the agent to manage multiple logical projects or modules within a single version-controlled repository.
+
+| Concept | Description | Path Example |
+| :--- | :--- | :--- |
+| **Workspace Root** | The base directory for all operations. | `~/.agent-vc/workspace/` |
+| **Project Folder** | A subdirectory representing a specific project. | `~/.agent-vc/workspace/chatbot-v1/` |
+| **Project Subpath** | A file or nested folder within a project. | `~/.agent-vc/workspace/chatbot-v1/src/utils.js` |
+
+### Working with the MCP Tools
+
+When using the `agent-vc` tools, you interact with files using the `project` and `subPath` parameters. This abstraction maps directly to the filesystem:
+
+1.  **Initializing a Project**: Running `vc_init_project(name: "my-app")` creates the directory `~/.agent-vc/workspace/my-app/`.
+2.  **Writing Files**: Running `write_file(project: "my-app", subPath: "main.py", content: "...")` writes to `~/.agent-vc/workspace/my-app/main.py`.
+3.  **Nested Folders**: You can use forward slashes in the `subPath` to create nested structures: `write_file(project: "my-app", subPath: "docs/specs/readme.md", ...)` will automatically create the `docs/specs/` directories if they don't exist.
+
+> [!NOTE]
+> All files created using the `write_file` tool are automatically added to Fossil's tracking (`fossil add`). To record these changes permanently in history, you must call `vc_commit`.
 
 ## Installation
 
@@ -34,11 +57,28 @@ A specialized MCP server for AI agents to have persistent state, version control
   "mcpServers": {
     "agent-vc": {
       "command": "npx",
-      "args": ["agent-vc-mcp"]
+      "args": ["agent-vc-mcp"],
+      "env": {
+        "AGENT_VC_WORKSPACE": "/path/to/my/project",
+        "AGENT_VC_FOSSIL_DB": "/path/to/backup.fossil"
+      }
     }
   }
 }
 ```
+
+## Environment Variables
+
+You can tune Agent-VC behavior by setting these environment variables:
+
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `AGENT_VC_ROOT_OVERRIDE` | The root folder for agent data. | `~/.agent-vc/` |
+| `AGENT_VC_WORKSPACE` | Path to the workspace checkout. | `~/.agent-vc/workspace/` (if cwd is `/` or `.`) |
+| `AGENT_VC_FOSSIL_DB` | Path to the Fossil repository file. | `~/.agent-vc/version_control.fossil` |
+
+> [!TIP]
+> Setting `AGENT_VC_WORKSPACE` is useful if you want the agent to operate directly on an existing local directory that you've already initialized with Fossil SCM.
 
 ## Tools
 

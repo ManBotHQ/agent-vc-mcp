@@ -3,9 +3,9 @@ import os from 'os';
 import { spawn } from 'child_process';
 
 export const AGENT_VC_ROOT = process.env.AGENT_VC_ROOT_OVERRIDE || path.join(os.homedir(), '.agent-vc');
-export const FOSSIL_DB_PATH = path.join(AGENT_VC_ROOT, 'workspace', 'version_control.fossil');
+export const FOSSIL_DB_PATH = process.env.AGENT_VC_FOSSIL_DB || path.join(AGENT_VC_ROOT, 'version_control.fossil');
 const potentialWorkspace = process.env.AGENT_VC_WORKSPACE || process.cwd();
-export const WORKSPACE_ROOT = potentialWorkspace === '/' 
+export const WORKSPACE_ROOT = (potentialWorkspace === '/' || potentialWorkspace === '.') 
   ? path.join(AGENT_VC_ROOT, 'workspace') 
   : potentialWorkspace;
 
