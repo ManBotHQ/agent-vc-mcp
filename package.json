@@ -1,6 +1,7 @@
 {
   "name": "agent-vc-mcp",
   "version": "1.0.0",
+  "license": "MIT",
   "description": "Agent-VC MCP Server",
   "main": "build/index.js",
   "bin": {
