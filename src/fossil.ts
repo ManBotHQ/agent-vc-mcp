@@ -96,12 +96,14 @@ export class FossilScm {
     const result = await runCommand('fossil', args, WORKSPACE_ROOT);
     
     if (!result.stdout.trim()) {
-        // Fallback to direct SQL if report list is empty
         const sqlCmd = status 
-            ? `SELECT id, title, status FROM ticket WHERE status='${status}'` 
-            : `SELECT id, title, status FROM ticket`;
-        const sqlRes = await runCommand('fossil', ['sql', sqlCmd], WORKSPACE_ROOT);
-        return sqlRes.stdout || "(No tasks found)";
+            ? `SELECT "id", "title", "status" FROM ticket WHERE status='${status}'` 
+            : `SELECT "id", "title", "status" FROM ticket`;
+        const sqlRes = await runCommand('fossil', ['sql', '-header', '-column', sqlCmd], WORKSPACE_ROOT);
+        
+        if (sqlRes.stdout.trim()) {
+            return `--- SQL FALLBACK --- \n${sqlRes.stdout.trim()}`;
+        }
     }
     
     return result.stdout.trim() || "(No tasks found. Try checking 'fossil ui' for details.)";
