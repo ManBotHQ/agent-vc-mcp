@@ -1,4 +1,5 @@
 # Agent-VC MCP Server
+![CI](https://github.com/ManBotHQ/agent-vc-mcp/actions/workflows/ci.yml/badge.svg)
 
 A specialized MCP server for AI agents to have persistent state, version control, and task management using [Fossil SCM](https://www.fossil-scm.org/).
 
