@@ -4,7 +4,7 @@ import { spawn } from 'child_process';
 
 export const AGENT_VC_ROOT = process.env.AGENT_VC_ROOT_OVERRIDE || path.join(os.homedir(), '.agent-vc');
 export const FOSSIL_DB_PATH = path.join(AGENT_VC_ROOT, 'version_control.fossil');
-export const WORKSPACE_ROOT = path.join(AGENT_VC_ROOT, 'workspace');
+export const WORKSPACE_ROOT = process.env.AGENT_VC_WORKSPACE || process.cwd();
 
 export function resolveSafePath(project: string, subPath?: string): string {
   const projectPath = path.join(WORKSPACE_ROOT, project);
