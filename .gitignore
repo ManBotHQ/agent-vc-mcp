@@ -1,0 +1,7 @@
+node_modules
+build
+.DS_Store
+*.fossil
+*.fossil-journal
+_FOSSIL_
+.fslckout
