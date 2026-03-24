@@ -91,7 +91,7 @@ Write code and commit it to history.
 ### 📋 Managing Tasks (Fossil Tickets)
 Track work using the built-in ticket system.
 ```json
-// Create a task
+// 1. Create a task
 {
   "name": "task_create",
   "arguments": {
@@ -100,18 +100,43 @@ Track work using the built-in ticket system.
   }
 }
 
-// List open tasks
+// 2. List open tasks (to get the Ticket ID)
 {
   "name": "task_list",
   "arguments": { "status": "Open" }
 }
+
+// 3. Update a task (using the first 7-10 characters of the Ticket ID)
+{
+  "name": "task_update",
+  "arguments": {
+    "id": "8d0aa38",
+    "status": "Closed",
+    "comment": "Work completed and tested."
+  }
+}
 ```
 
-### 🔍 Inspecting Progress
+### 🔍 Inspecting Progress & History
 ```json
 // Check modified files
 { "name": "vc_status", "arguments": {} }
 
 // View code diff
 { "name": "vc_diff", "arguments": {} }
+
+// List all files in a project
+{
+  "name": "list_files",
+  "arguments": { "project": "chatbot-v1" }
+}
+
+// Read a specific file
+{
+  "name": "read_file",
+  "arguments": {
+    "project": "chatbot-v1",
+    "subPath": "index.js"
+  }
+}
 ```
