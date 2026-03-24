@@ -92,13 +92,18 @@ export class FossilScm {
   }
 
   static async listTickets(status?: string): Promise<string> {
-    // We specify title to bypass the default report behavior which can be finicky in fresh repos
-    const args = ['ticket', 'list', 'title'];
-    if (status) {
-        // Fossil list status <value> works too
-        args.push('status', status);
-    }
+    const args = status ? ['ticket', 'list', 'status', status] : ['ticket', 'list'];
     const result = await runCommand('fossil', args, WORKSPACE_ROOT);
+    
+    if (!result.stdout.trim()) {
+        // Fallback to direct SQL if report list is empty
+        const sqlCmd = status 
+            ? `SELECT id, title, status FROM ticket WHERE status='${status}'` 
+            : `SELECT id, title, status FROM ticket`;
+        const sqlRes = await runCommand('fossil', ['sql', sqlCmd], WORKSPACE_ROOT);
+        return sqlRes.stdout || "(No tasks found)";
+    }
+    
     return result.stdout.trim() || "(No tasks found. Try checking 'fossil ui' for details.)";
   }
 }
