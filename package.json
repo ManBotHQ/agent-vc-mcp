@@ -18,7 +18,8 @@
     "start": "node build/index.js",
     "dev": "ts-node src/index.ts",
     "prepublishOnly": "npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest",
+    "test:e2e": "vitest run tests/e2e.test.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.6.0"
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^4.1.1"
   }
 }

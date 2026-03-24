@@ -42,7 +42,7 @@ export class FossilScm {
   }
 
   static async commit(message: string, project?: string): Promise<string> {
-    const args = ['commit', '-m', `"${message}"`];
+    const args = ['commit', '-m', message];
     if (project) {
         // We could restrict commit to specific project subfolders if needed
     }
@@ -70,21 +70,21 @@ export class FossilScm {
 
   // TICKET TOOLS
   static async createTicket(title: string, description: string): Promise<string> {
-    // In fossil: ticket add title="Value" ...
-    const result = await runCommand('fossil', ['ticket', 'add', `title='${title}'`, `comment='${description}'`], WORKSPACE_ROOT);
-    if (result.code !== 0) throw new Error(`Ticket create failed: ${result.stderr}`);
+    const result = await runCommand('fossil', ['ticket', 'add', 'title', title, 'comment', description], WORKSPACE_ROOT);
+    if (result.code !== 0) throw new Error(`Ticket create failed: ${result.stderr || result.stdout}`);
     return result.stdout;
   }
 
   static async updateTicket(id: string, status: string, comment: string): Promise<string> {
-    const result = await runCommand('fossil', ['ticket', 'set', id, `status='${status}'`, `comment='${comment}'`], WORKSPACE_ROOT);
-    if (result.code !== 0) throw new Error(`Ticket update failed: ${result.stderr}`);
+    const result = await runCommand('fossil', ['ticket', 'set', id, 'status', status, 'comment', comment], WORKSPACE_ROOT);
+    if (result.code !== 0) throw new Error(`Ticket update failed: ${result.stderr || result.stdout}`);
     return result.stdout;
   }
 
   static async listTickets(status?: string): Promise<string> {
     const args = ['ticket', 'list'];
+    // By default, let's try to list title and status
     const result = await runCommand('fossil', args, WORKSPACE_ROOT);
-    return result.stdout;
+    return result.stdout || "(Empty)";
   }
 }

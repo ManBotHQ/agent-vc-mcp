@@ -2,7 +2,7 @@ import path from 'path';
 import os from 'os';
 import { spawn } from 'child_process';
 
-export const AGENT_VC_ROOT = path.join(os.homedir(), '.agent-vc');
+export const AGENT_VC_ROOT = process.env.AGENT_VC_ROOT_OVERRIDE || path.join(os.homedir(), '.agent-vc');
 export const FOSSIL_DB_PATH = path.join(AGENT_VC_ROOT, 'version_control.fossil');
 export const WORKSPACE_ROOT = path.join(AGENT_VC_ROOT, 'workspace');
 
@@ -26,7 +26,7 @@ export interface ExecResult {
 
 export async function runCommand(cmd: string, args: string[], cwd: string = AGENT_VC_ROOT): Promise<ExecResult> {
   return new Promise((resolve) => {
-    const child = spawn(cmd, args, { cwd, shell: true });
+    const child = spawn(cmd, args, { cwd, shell: false });
     let stdout = '';
     let stderr = '';
 
