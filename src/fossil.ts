@@ -13,8 +13,8 @@ export class FossilScm {
   }
 
   static async bootstrap(): Promise<void> {
-    // 1. Create root directory
-    await fs.mkdir(AGENT_VC_ROOT, { recursive: true });
+    // 1. Create directory for Fossil DB
+    await fs.mkdir(path.dirname(FOSSIL_DB_PATH), { recursive: true });
     
     // 2. Init fossil DB if it doesn't exist
     if (!(await FossilScm.exists())) {
@@ -43,7 +43,7 @@ export class FossilScm {
     
     if (!isOpened) {
       console.error('Opening Fossil repository in workspace...');
-      const openResult = await runCommand('fossil', ['open', FOSSIL_DB_PATH], WORKSPACE_ROOT);
+      const openResult = await runCommand('fossil', ['open', FOSSIL_DB_PATH, '--keep'], WORKSPACE_ROOT);
       // Fossil open sometimes fails if already open or directory not empty, but let's check for real errors
       if (openResult.code !== 0 && !openResult.stderr.includes('already open')) {
          throw new Error(`Fossil open failed: ${openResult.stderr || openResult.stdout}`);
